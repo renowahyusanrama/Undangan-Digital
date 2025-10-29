@@ -114,10 +114,25 @@ body{
   .mock-3{right:-8px}
 }
 @media (max-width:640px){
-  .mock-stack{min-height:380px}
-  .mock-1{width:320px;height:380px; right:50%; transform:translateX(50%) rotate(-1deg)}
-  .mock-2{display:none}
-  .mock-3{display:none}
+  .mock-stack{
+    display:flex;
+    flex-direction:row;
+    gap:10px;
+    min-height:auto;
+    justify-content:center;
+  }
+  .mock{
+    position:static;
+    width:calc(33.33% - 10px);
+    height:auto;
+    max-height:200px;
+    transform:none;
+    animation:none;
+  }
+  .mock img{
+    height:100%;
+    object-fit:cover;
+  }
 }
 
 /* Steps */
