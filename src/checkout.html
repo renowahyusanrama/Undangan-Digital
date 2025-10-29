@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Checkout Paket — Momen Kita</title>
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+
+  <!-- Alpine -->
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+  <!-- Styles khusus checkout -->
+  <link rel="stylesheet" href="checkout.css"/>
+</head>
+
+<body>
+  <!-- Header -->
+  <header id="site-header" x-data="{open:false}" class="site-header">
+    <div class="container">
+      <div class="nav-row">
+        <a href="index.html" class="brand">Momen Kita</a>
+
+        <nav class="nav-links md:flex hidden">
+          <a href="index.html#fitur"  class="nav-link">Fitur</a>
+          <a href="index.html#desain" class="nav-link">Desain</a>
+          <a href="index.html#harga"  class="nav-link">Harga</a>
+          <a href="index.html#kontak" class="nav-link">Kontak</a>
+        </nav>
+
+        <a href="index.html#harga" class="btn-pill md:inline-flex hidden">Kembali ke Paket</a>
+
+        <button class="md:hidden menu-btn" @click="open=!open" aria-label="Buka menu">
+          <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" fill="none">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M4 6h16M4 12h16M4 18h16"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Mobile menu -->
+      <div class="md:hidden" x-show="open" @click.away="open=false">
+        <nav class="mobile-links">
+          <a href="index.html#fitur"  class="nav-link">Fitur</a>
+          <a href="index.html#desain" class="nav-link">Desain</a>
+          <a href="index.html#harga"  class="nav-link">Harga</a>
+          <a href="index.html#kontak" class="nav-link">Kontak</a>
+          <a href="index.html#harga"  class="btn-pill text-center">Kembali ke Paket</a>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <!-- ====== MAIN ====== -->
+  <main>
+    <section class="section pt-10">
+      <div class="container">
+        <h1 class="section-title text-center">Pilih Metode Pembayaran</h1>
+
+        <div class="checkout-stack">
+          <!-- Ringkasan (di atas, tengah) -->
+          <aside class="checkout-card">
+            <h2 class="card-title">Ringkasan Paket</h2>
+
+            <div class="row"><span>Paket</span><strong id="sum-plan">-</strong></div>
+            <div class="row"><span>Harga</span><strong id="sum-price">-</strong></div>
+
+            <div class="divider"></div>
+
+            <div class="row total"><span>Total</span><strong id="sum-total">-</strong></div>
+
+            <p class="help">*Pilih metode pembayaran di bawah, lalu konfirmasi via WhatsApp.</p>
+
+            <a id="btn-wa" target="_blank" href="#" class="btn-pill w-full block text-center mt-3">
+              Konfirmasi via WhatsApp
+            </a>
+
+            <a href="index.html#harga" class="btn-soft w-full block text-center mt-2">
+              Kembali ke Paket
+            </a>
+          </aside>
+
+          <!-- Grid pembayaran (lebih besar & nyaman) -->
+          <div class="pay-wrap">
+            <div class="pay-grid">
+              <label class="bank-card">
+                <input type="radio" name="pay" value="QRIS" />
+                <img src="images/QRIS.png" alt="QRIS"/>
+                <span>QRIS</span>
+              </label>
+
+              <label class="bank-card">
+                <input type="radio" name="pay" value="BNI" />
+                <img src="images/BNI.png" alt="BNI"/>
+                <span>BNI</span>
+              </label>
+
+              <label class="bank-card">
+                <input type="radio" name="pay" value="BRI" />
+                <img src="images/BRI.png" alt="BRI"/>
+                <span>BRI</span>
+              </label>
+
+              <label class="bank-card">
+                <input type="radio" name="pay" value="BCA" />
+                <img src="images/BCA.png" alt="BCA"/>
+                <span>BCA</span>
+              </label>
+
+              <label class="bank-card">
+                <input type="radio" name="pay" value="MANDIRI" />
+                <img src="images/Mandiri.webp" alt="Mandiri"/>
+                <span>Mandiri</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer selalu di bawah -->
+  <footer class="footer">
+    <div class="container text-center text-white">
+      <p>&copy; 2025 Momen Kita. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <!-- Script kecil: header shrink + paket + WA -->
+  <script>
+    // header shrink
+    (function(){
+      const h = document.getElementById('site-header');
+      const onS = () => (window.scrollY > 8) ? h.classList.add('is-scrolled') : h.classList.remove('is-scrolled');
+      onS(); window.addEventListener('scroll', onS, {passive:true});
+    })();
+
+    // Paket dari URL
+    const params   = new URLSearchParams(location.search);
+    const plan     = (params.get('plan') || 'silver').toLowerCase();
+    const priceMap = { bronze: 100000, silver: 150000, gold: 250000 };
+    const rupiahK  = n => 'Rp ' + (n/1000).toFixed(0) + 'k';
+
+    const sumPlan  = document.getElementById('sum-plan');
+    const sumPrice = document.getElementById('sum-price');
+    const sumTotal = document.getElementById('sum-total');
+
+    sumPlan.textContent  = plan.charAt(0).toUpperCase() + plan.slice(1);
+    sumPrice.textContent = rupiahK(priceMap[plan] || 150000);
+    sumTotal.textContent = rupiahK(priceMap[plan] || 150000);
+
+    // WhatsApp
+    const radios = document.querySelectorAll('input[name="pay"]');
+    const btnWA  = document.getElementById('btn-wa');
+
+    function updateWA(){
+      const chosen = document.querySelector('input[name="pay"]:checked')?.value || 'QRIS';
+      const msg = `Halo, saya ingin konfirmasi pembayaran paket ${sumPlan.textContent} via ${chosen}.`;
+      btnWA.href = `https://wa.me/62811456999?text=${encodeURIComponent(msg)}`;
+    }
+
+    radios.forEach(r=>{
+      r.addEventListener('change', ()=>{
+        document.querySelectorAll('.bank-card').forEach(c=>c.classList.remove('is-selected'));
+        r.closest('.bank-card').classList.add('is-selected');
+        updateWA();
+      });
+    });
+
+    // default
+    radios[0].checked = true;
+    radios[0].dispatchEvent(new Event('change'));
+  </script>
+</body>
+</html>

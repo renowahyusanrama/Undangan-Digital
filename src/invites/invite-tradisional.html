@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Undangan – Tradisional Gold (Reno & Diva)</title>
+
+  <!-- TailwindCSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- EmailJS -->
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script type="text/javascript">
+    (function(){
+      emailjs.init({
+        publicKey: "xWVSKIZ7kkEPsUPYX",
+      });
+    })();
+  </script>
+
+  <!-- Firebase -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCw0DuB0b_2xyLyae4rheKP0zxg9uG4TKs",
+      authDomain: "momen-lkita.firebaseapp.com",
+      projectId: "momen-lkita",
+      storageBucket: "momen-lkita.firebasestorage.app",
+      messagingSenderId: "303834377913",
+      appId: "1:303834377913:web:78c5fdf422ec8fb1fc7568",
+      measurementId: "G-KV17XXM2CD"
+    };
+
+    let app, db;
+    try {
+      app = initializeApp(firebaseConfig);
+      db = getFirestore(app);
+      console.log('Firebase initialized successfully');
+    } catch (error) {
+      console.error('Firebase initialization error:', error);
+    }
+
+    window.firebaseApp = app;
+    window.firebaseDb = db;
+    window.emailjsLib = emailjs;
+  </script>
+
+  <!-- RSVP Function -->
+  <script>
+    window.submitRSVP = async function(form) {
+      const btn = form.querySelector('button[type="submit"]');
+      const oldText = btn.textContent;
+
+      try {
+        btn.textContent = "Mengirim...";
+        btn.disabled = true;
+
+        const formData = new FormData(form);
+        const data = {
+          nama: formData.get('nama'),
+          email: formData.get('email'),
+          kehadiran: formData.get('kehadiran'),
+          jumlahTamu: parseInt(formData.get('jumlahTamu')) || 1,
+          ucapan: formData.get('ucapan'),
+          timestamp: new Date(),
+          tema: 'tradisional-gold'
+        };
+
+        // Simpan ke Firestore
+        if (window.firebaseDb) {
+          await addDoc(collection(window.firebaseDb, "rsvp"), data);
+        }
+
+        // Kirim email konfirmasi
+        if (window.emailjsLib) {
+          await window.emailjsLib.send(
+            'service_d291klq',
+            'template_uq1ktop',
+            {
+              to_email: data.email,
+              nama: data.nama,
+              kehadiran: data.kehadiran,
+              jumlahTamu: data.jumlahTamu,
+              ucapan: data.ucapan,
+              tanggal_acara: 'Senin, 2 Februari 2026',
+              lokasi: 'Universitas Muhammadiyah Malang (UMM)'
+            }
+          );
+          alert("✅ Data tersimpan dan email konfirmasi berhasil dikirim!");
+        } else {
+          alert("✅ Data tersimpan, namun email konfirmasi tidak dikirim (EmailJS tidak aktif).");
+        }
+
+        form.reset();
+      } catch (err) {
+        alert("❌ Gagal mengirim data: " + err.message);
+        console.error(err);
+      } finally {
+        btn.textContent = oldText;
+        btn.disabled = false;
+      }
+    };
+  </script>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root { --gold: #b78b3e; }
+
+    body {
+      font-family: Inter, sans-serif;
+      color: #0f172a;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background: url('../images/MasAdek.jpg') center/cover no-repeat;
+      filter: brightness(.42);
+      z-index: -1;
+    }
+
+    .serif { font-family: "Playfair Display", serif; }
+    .glass { backdrop-filter: blur(6px) saturate(120%); }
+
+    /* Love Particles */
+    .love-particles { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; overflow: hidden; }
+    .love-particle { position: absolute; font-size: 20px; color: rgba(176, 137, 64, 0.6); animation: fall 8s linear infinite; user-select: none; }
+    .love-particle:nth-child(odd) { animation-delay: -2s; animation-duration: 10s; }
+    .love-particle:nth-child(3n) { animation-delay: -4s; animation-duration: 12s; }
+    .love-particle:nth-child(5n) { animation-delay: -6s; animation-duration: 9s; }
+    @keyframes fall { 0%{transform:translateY(-100px)rotate(0);opacity:0;}10%{opacity:1;}90%{opacity:1;}100%{transform:translateY(100vh)rotate(360deg);opacity:0;} }
+  </style>
+</head>
+
+<body>
+  <!-- Animasi Hati -->
+  <div class="love-particles">
+    <div class="love-particle">💕</div><div class="love-particle">💖</div>
+    <div class="love-particle">💗</div><div class="love-particle">💞</div>
+    <div class="love-particle">💘</div><div class="love-particle">💝</div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('.love-particle').forEach((p,i)=>{
+        p.style.left = Math.random()*100+'%';
+        p.style.animationDelay = (i*0.5)+'s';
+      });
+    });
+  </script>
+
+  <!-- HERO -->
+  <section class="px-6 pt-12">
+    <div class="max-w-4xl mx-auto text-center bg-white/80 glass ring-1 ring-black/10 shadow rounded-3xl p-10">
+      <div class="text-[11px] tracking-[0.3em] text-amber-700">THE WEDDING OF</div>
+      <h1 class="serif text-4xl md:text-5xl font-semibold mt-2">Reno &amp; Diva</h1>
+      <p class="mt-2">Senin, 2 Februari 2026 · Universitas Muhammadiyah Malang</p>
+      <div id="cd-tradisional" class="mt-6 flex justify-center gap-3"></div>
+    </div>
+  </section>
+
+  <!-- DETAIL ACARA -->
+  <section class="px-6 py-10">
+    <div class="max-w-4xl mx-auto grid md:grid-cols-2 gap-6">
+      <div class="rounded-2xl bg-white/90 glass p-6 shadow ring-1 ring-black/5">
+        <h3 class="serif text-xl mb-2">Akad Nikah</h3>
+        <p>Senin, 2 Februari 2026 — 09.00 WIB</p>
+        <p>Universitas Muhammadiyah Malang (UMM)</p>
+      </div>
+      <div class="rounded-2xl bg-white/90 glass p-6 shadow ring-1 ring-black/5">
+        <h3 class="serif text-xl mb-2">Resepsi</h3>
+        <p>Senin, 2 Februari 2026 — 12.00–15.00 WIB</p>
+        <p>Universitas Muhammadiyah Malang (UMM)</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- LOKASI -->
+  <section class="px-6 pb-6">
+    <div class="max-w-4xl mx-auto text-center">
+      <h2 class="serif text-2xl text-white mb-3">Lokasi Acara</h2>
+      <iframe class="w-full h-72 rounded-2xl shadow" src="https://www.google.com/maps?q=Universitas%20Muhammadiyah%20Malang&output=embed"></iframe>
+    </div>
+  </section>
+
+  <!-- RSVP -->
+  <section class="px-6 pb-16">
+    <div class="max-w-4xl mx-auto">
+      <h2 class="serif text-2xl text-white mb-3 text-center">Konfirmasi Kehadiran</h2>
+      <form onsubmit="event.preventDefault(); submitRSVP(this);" class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white/90 glass p-6 rounded-2xl shadow">
+        <input required name="nama" placeholder="Nama Lengkap" class="col-span-2 rounded-lg border p-3">
+        <input required name="email" type="email" placeholder="Email" class="rounded-lg border p-3">
+        <select name="kehadiran" class="rounded-lg border p-3">
+          <option value="Hadir">Hadir</option><option value="Tidak Hadir">Tidak Hadir</option>
+        </select>
+        <input type="number" min="1" name="jumlahTamu" placeholder="Jumlah Tamu" class="rounded-lg border p-3">
+        <textarea name="ucapan" placeholder="Ucapan" class="col-span-2 rounded-lg border p-3 h-28"></textarea>
+        <button type="submit" class="col-span-2 rounded-lg bg-[color:var(--gold)] text-white py-3 hover:brightness-95">Kirim</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- Countdown -->
+  <script>
+    (function(){
+      const el=document.getElementById('cd-tradisional');
+      if(!el) return;
+      const t=new Date('2026-02-02T09:00:00+07:00').getTime();
+      const box=(v,l)=>`<div class='text-amber-700'><div class='bg-white/10 glass px-3 py-2 rounded-lg text-lg font-semibold'>${v}</div><div class='text-xs mt-1 text-amber-700/80'>${l}</div></div>`;
+      setInterval(()=>{
+        const d=Math.max(0,t-Date.now());
+        const day=Math.floor(d/86400000),h=Math.floor(d%86400000/3600000),
+        m=Math.floor(d%3600000/60000),s=Math.floor(d%60000/1000);
+        el.innerHTML=box(day,'Hari')+box(h,'Jam')+box(m,'Menit')+box(s,'Detik');
+      },1000);
+    })();
+  </script>
+</body>
+</html>

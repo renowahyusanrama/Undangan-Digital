@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Undangan – Minimal Olive (Reno & Diva)</title>
+
+  <!-- Tailwind (dev) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- EmailJS (global) -->
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script>
+    (function () {
+      emailjs.init({ publicKey: "xWVSKIZ7kkEPsUPYX" }); // ganti jika perlu
+    })();
+  </script>
+
+  <!-- Firebase SDK (modular) -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCw0DuB0b_2xyLyae4rheKP0zxg9uG4TKs",
+      authDomain: "momen-lkita.firebaseapp.com",
+      projectId: "momen-lkita",
+      storageBucket: "momen-lkita.appspot.com",
+      messagingSenderId: "303834377913",
+      appId: "1:303834377913:web:78c5fdf422ec8fb1fc7568",
+      measurementId: "G-KV17XXM2CD",
+    };
+
+    let app, db;
+    try {
+      app = initializeApp(firebaseConfig);
+      db = getFirestore(app);
+      console.log("Firebase initialized successfully");
+    } catch (error) {
+      console.error("Firebase initialization error:", error);
+    }
+
+    // expose ke global agar script lain bisa akses
+    window.firebaseApp = app;
+    window.firebaseDb = db;
+    window.emailjsLib = emailjs;
+  </script>
+
+  <!-- RSVP Function (MODULE) -->
+  <script type="module">
+    import {
+      collection,
+      addDoc,
+      serverTimestamp,
+    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    // dipanggil dari onsubmit di <form>
+    window.submitRSVP = async function (form) {
+      console.log("submitRSVP called with form:", form);
+
+      const submitBtn = form.querySelector('button[type="submit"]');
+      const originalText = submitBtn.textContent;
+
+      try {
+        console.log("Starting RSVP submission");
+        submitBtn.textContent = "Mengirim...";
+        submitBtn.disabled = true;
+
+        const formData = new FormData(form);
+        console.log("Form data:", Object.fromEntries(formData));
+
+        const jumlahTamuVal = parseInt(formData.get("jumlahTamu"));
+        const rsvpData = {
+          nama: formData.get("nama"),
+          email: formData.get("email"),
+          kehadiran: formData.get("kehadiran"),
+          jumlahTamu: Number.isFinite(jumlahTamuVal) ? jumlahTamuVal : 1,
+          ucapan: formData.get("ucapan"),
+          createdAt: serverTimestamp(),
+          template: "minimal",
+        };
+
+        console.log("RSVP Data:", rsvpData);
+
+        if (!window.firebaseDb) throw new Error("Firestore not initialized");
+
+        console.log("Saving to Firestore");
+        await addDoc(collection(window.firebaseDb, "rsvp"), rsvpData);
+        console.log("Data saved to Firestore");
+
+        // --- Kirim email konfirmasi via EmailJS ---
+        if (window.emailjsLib) {
+          console.log("Sending email");
+          try {
+            const params = {
+              // pastikan nama param SAMA dengan yang ada di template EmailJS
+              to_email: String(rsvpData.email || ""),
+              nama: String(rsvpData.nama || ""),
+              kehadiran: String(rsvpData.kehadiran || ""),
+              jumlahTamu: String(rsvpData.jumlahTamu ?? ""),
+              ucapan: String(rsvpData.ucapan || "-"),
+              tanggal_acara: "Senin, 2 Februari 2026",
+              lokasi: "Universitas Muhammadiyah Malang (UMM)",
+              reply_to: String(rsvpData.email || "")
+            };
+
+            const res = await window.emailjsLib.send(
+              "service_d291klq",     // Service ID
+              "template_uq1ktop",    // Template ID
+              params                 // Template params
+              // publicKey tak perlu di sini karena sudah init; boleh tambahkan { publicKey: "xWVSKIZ7kkEPsUPYX" }
+            );
+            console.log("EmailJS response:", res);
+            alert(
+              "Terima kasih! Konfirmasi kehadiran tersimpan dan email terkirim ke " +
+                rsvpData.email
+            );
+          } catch (emailError) {
+            console.error("EmailJS error raw:", emailError);
+            console.error("EmailJS error text:", emailError?.text);
+            alert(
+              "Data tersimpan, namun email konfirmasi gagal dikirim. (" +
+                (emailError?.text || emailError.message) + ")"
+            );
+          }
+        } else {
+          console.log("EmailJS not available, skipping email");
+          alert("Terima kasih! Konfirmasi kehadiran berhasil disimpan.");
+        }
+
+        form.reset();
+      } catch (error) {
+        console.error("Error menyimpan RSVP:", error);
+        alert("Maaf, terjadi kesalahan: " + error.message + ". Silakan coba lagi.");
+      } finally {
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
+      }
+
+      return false; // cegah submit default
+    };
+  </script>
+
+  <!-- Fonts & Styles -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600&display=swap"
+    rel="stylesheet"
+  />
+  <style>
+    :root { --olive: #6b7d57 }
+
+    /* Love Particles Animation */
+    .love-particles { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; overflow: hidden; }
+    .love-particle { position: absolute; font-size: 20px; color: rgba(176, 137, 64, 0.6); animation: fall 8s linear infinite; user-select: none; }
+    .love-particle:nth-child(odd){ animation-delay:-2s; animation-duration:10s }
+    .love-particle:nth-child(3n){ animation-delay:-4s; animation-duration:12s }
+    .love-particle:nth-child(5n){ animation-delay:-6s; animation-duration:9s }
+    @keyframes fall {
+      0% { transform: translateY(-100px) rotate(0deg); opacity: 0; }
+      10% { opacity: 1; }
+      90% { opacity: 1; }
+      100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+    }
+
+    body { font-family: Inter, system-ui, Arial, sans-serif; color:#0f172a; }
+    body::before { content:""; position:fixed; inset:0; background:url('../images/MasAdek.jpg') center/cover no-repeat; filter:brightness(.48); z-index:-1; }
+
+    .serif { font-family: "Playfair Display", serif }
+    .glass { backdrop-filter: saturate(120%) blur(6px) }
+
+    /* Calendar Styles */
+    .calendar-grid { display:grid; grid-template-columns: repeat(7, 1fr); gap:4px; margin-bottom:16px; }
+    .calendar-header { display: contents; }
+    .calendar-header > div { padding:8px; text-align:center; font-weight:600; font-size:12px; color:#6b7280; }
+    .calendar-days { display: contents; }
+    .calendar-day { aspect-ratio:1; display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:500; border-radius:6px; transition: all .2s ease; }
+    .calendar-day.empty { background: transparent; }
+    .calendar-day:not(.empty){ background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.2); }
+    .calendar-day.wedding-day { background: var(--olive); color:#fff; font-weight:700; border:2px solid rgba(255,255,255,.3); box-shadow:0 2px 8px rgba(0,0,0,.2); }
+    .calendar-day:hover:not(.empty){ background: rgba(255,255,255,.2); transform: scale(1.05); }
+    .calendar-day.wedding-day:hover{ background: var(--olive); transform: scale(1.05); }
+
+    @media (max-width: 640px) {
+      .calendar-grid{ gap:2px }
+      .calendar-day{ font-size:12px }
+      .calendar-header > div { font-size:10px; padding:4px }
+    }
+  </style>
+</head>
+<body>
+  <!-- Love Particles -->
+  <div class="love-particles">
+    <div class="love-particle">💕</div><div class="love-particle">💖</div><div class="love-particle">💗</div>
+    <div class="love-particle">💓</div><div class="love-particle">💞</div><div class="love-particle">💘</div>
+    <div class="love-particle">💝</div><div class="love-particle">💟</div><div class="love-particle">💕</div>
+    <div class="love-particle">💖</div><div class="love-particle">💗</div><div class="love-particle">💓</div>
+    <div class="love-particle">💞</div><div class="love-particle">💘</div><div class="love-particle">💝</div>
+    <div class="love-particle">💟</div><div class="love-particle">💕</div><div class="love-particle">💖</div>
+    <div class="love-particle">💗</div><div class="love-particle">💓</div><div class="love-particle">💞</div>
+    <div class="love-particle">💘</div><div class="love-particle">💝</div><div class="love-particle">💟</div>
+  </div>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const particles = document.querySelectorAll(".love-particle");
+      particles.forEach((p, i) => {
+        p.style.left = Math.random() * 100 + "%";
+        p.style.animationDelay = i * 0.5 + "s";
+      });
+    });
+  </script>
+
+  <!-- HERO -->
+  <header class="max-w-3xl mx-auto px-6 pt-14 pb-8 text-center">
+    <div class="inline-block px-3 py-1 rounded-full text-[11px] tracking-[0.3em] bg-white/10 text-white/90 ring-1 ring-white/20 glass">
+      THE WEDDING OF
+    </div>
+    <h1 class="serif text-4xl md:text-5xl text-white mt-3">Reno &amp; Diva</h1>
+    <p class="mt-2 text-white/80">Senin, 2 Februari 2026 · Universitas Muhammadiyah Malang</p>
+
+    <!-- Countdown -->
+    <div id="cd-minimal" class="mt-6 flex justify-center gap-3"></div>
+
+    <a href="#detail" class="inline-block mt-6 px-5 py-2 rounded-full bg-[color:var(--olive)] text-white hover:brightness-95 shadow">
+      Lihat Detail
+    </a>
+  </header>
+
+  <!-- DETAIL -->
+  <section id="detail" class="max-w-3xl mx-auto px-6 pb-6">
+    <div class="rounded-2xl bg-white/90 glass shadow ring-1 ring-black/10 p-6">
+      <div class="grid md:grid-cols-2 gap-4">
+        <div>
+          <p class="font-semibold">Akad Nikah</p>
+          <p>Senin, 2 Februari 2026 — 09.00 WIB</p>
+          <p>Universitas Muhammadiyah Malang (UMM)</p>
+        </div>
+        <div>
+          <p class="font-semibold">Resepsi</p>
+          <p>Senin, 2 Februari 2026 — 12.00–15.00 WIB</p>
+          <p>Universitas Muhammadiyah Malang (UMM)</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MAP + CTA -->
+  <section class="max-w-3xl mx-auto px-6 pb-6">
+    <div class="rounded-2xl overflow-hidden shadow ring-1 ring-black/20">
+      <iframe class="w-full h-72 border-0"
+        src="https://www.google.com/maps?q=Universitas%20Muhammadiyah%20Malang&output=embed"
+        loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+    </div>
+    <div class="mt-4 flex flex-wrap gap-3">
+      <a target="_blank" href="https://wa.me/62811456999"
+         class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[color:var(--olive)] text-white hover:brightness-95">
+        <span>WhatsApp</span>
+      </a>
+      <a target="_blank" href="https://maps.google.com/?q=Universitas%20Muhammadiyah%20Malang"
+         class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/90 hover:bg-white ring-1 ring-slate-300">
+        <span>Petunjuk Arah</span>
+      </a>
+      <a target="_blank" href="https://calendar.google.com/calendar/render?action=TEMPLATE&text=Pernikahan+Reno+%26+Diva&dates=20260202T020000Z/20260202T080000Z&details=Akad+Nikah+dan+Resepsi+Pernikahan+Reno+dan+Diva&location=Universitas+Muhammadiyah+Malang+(UMM)&sf=true&output=xml"
+         class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[color:var(--olive)] text-white hover:brightness-95">
+        <span>Kalender</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- CUACA -->
+  <section class="max-w-3xl mx-auto px-6 pb-6">
+    <div class="rounded-2xl bg-white/90 glass shadow ring-1 ring-black/10 p-6">
+      <h3 class="font-semibold mb-2">Prakiraan Cuaca</h3>
+      <div id="weather-info-minimal" class="text-sm">
+        <p>Memuat informasi cuaca...</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- KALENDER ACARA -->
+  <section class="max-w-3xl mx-auto px-6 pb-6">
+    <h2 class="serif text-2xl text-white mb-3 text-center">Kalender Acara</h2>
+    <div class="rounded-2xl bg-white/90 glass shadow ring-1 ring-black/10 p-6">
+      <h3 class="text-lg font-semibold mb-4 text-center">Februari 2026</h3>
+      <div class="calendar-grid">
+        <div class="calendar-header">
+          <div>Min</div><div>Sen</div><div>Sel</div><div>Rab</div><div>Kam</div><div>Jum</div><div>Sab</div>
+        </div>
+        <div class="calendar-days">
+          <div class="calendar-day empty"></div><div class="calendar-day empty"></div><div class="calendar-day empty"></div>
+          <div class="calendar-day empty"></div><div class="calendar-day empty"></div><div class="calendar-day">1</div>
+          <div class="calendar-day wedding-day">2</div>
+          <div class="calendar-day">3</div><div class="calendar-day">4</div><div class="calendar-day">5</div>
+          <div class="calendar-day">6</div><div class="calendar-day">7</div><div class="calendar-day">8</div>
+          <div class="calendar-day">9</div><div class="calendar-day">10</div><div class="calendar-day">11</div>
+          <div class="calendar-day">12</div><div class="calendar-day">13</div><div class="calendar-day">14</div>
+          <div class="calendar-day">15</div><div class="calendar-day">16</div><div class="calendar-day">17</div>
+          <div class="calendar-day">18</div><div class="calendar-day">19</div><div class="calendar-day">20</div>
+          <div class="calendar-day">21</div><div class="calendar-day">22</div><div class="calendar-day">23</div>
+          <div class="calendar-day">24</div><div class="calendar-day">25</div><div class="calendar-day">26</div>
+          <div class="calendar-day">27</div><div class="calendar-day">28</div>
+        </div>
+      </div>
+      <div class="mt-4 text-center">
+        <div class="inline-flex items-center gap-2 text-sm">
+          <div class="w-3 h-3 bg-[color:var(--olive)] rounded"></div>
+          <span>Hari Pernikahan</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MUSIK -->
+  <section class="max-w-3xl mx-auto px-6 pb-8 text-center">
+    <audio id="wedding-music" autoplay loop style="display: none;">
+      <source src="../Music/Rio Clappy - Bunga Abadi (Official Lyric Video) [fPMB2H450iI].mp3" type="audio/mpeg" />
+      Browser Anda tidak mendukung pemutar audio.
+    </audio>
+    <p class="text-white/70 text-sm">Musik: Rio Clappy - Bunga Abadi</p>
+  </section>
+
+  <!-- RSVP -->
+  <section class="max-w-3xl mx-auto px-6 pb-16">
+    <h2 class="serif text-2xl text-white mb-3 text-center">Konfirmasi Kehadiran</h2>
+    <form onsubmit="event.preventDefault(); submitRSVP(this); return false;"
+          class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white/90 glass p-6 rounded-2xl shadow">
+      <input required name="nama" placeholder="Nama Lengkap" class="col-span-1 md:col-span-2 rounded-lg border p-3" />
+      <input required name="email" type="email" placeholder="Email" class="rounded-lg border p-3" />
+      <select name="kehadiran" class="rounded-lg border p-3">
+        <option value="Hadir">Hadir</option>
+        <option value="Tidak Hadir">Tidak Hadir</option>
+      </select>
+      <input type="number" min="1" name="jumlahTamu" placeholder="Jumlah Tamu" class="rounded-lg border p-3" />
+      <textarea name="ucapan" placeholder="Ucapan" class="col-span-1 md:col-span-2 rounded-lg border p-3 h-28"></textarea>
+      <button type="submit" class="col-span-1 md:col-span-2 rounded-lg bg-[color:var(--olive)] text-white py-3 hover:brightness-95">
+        Kirim
+      </button>
+    </form>
+  </section>
+
+  <!-- Utils: countdown, cuaca, autoplay -->
+  <script>
+    // Countdown menuju 2 Feb 2026 09:00 WIB
+    (function () {
+      const el = document.getElementById("cd-minimal");
+      if (!el) return;
+      const target = new Date("2026-02-02T09:00:00+07:00").getTime();
+      const card = (val, label) => `
+        <div class="min-w-[72px] text-white">
+          <div class="rounded-lg bg-white/10 glass px-3 py-2 text-lg font-semibold ring-1 ring-white/15">${val}</div>
+          <div class="text-xs mt-1 text-white/80">${label}</div>
+        </div>`;
+      const tick = () => {
+        const now = Date.now(),
+          d = Math.max(0, target - now);
+        const day = Math.floor(d / 86400000);
+        const hr = Math.floor((d % 86400000) / 3600000);
+        const mn = Math.floor((d % 3600000) / 60000);
+        const sc = Math.floor((d % 60000) / 1000);
+        el.innerHTML =
+          card(day, "Hari") + card(hr, "Jam") + card(mn, "Menit") + card(sc, "Detik");
+      };
+      tick();
+      setInterval(tick, 1000);
+    })();
+
+    // Cuaca Open-Meteo (gratis)
+    async function fetchWeatherMinimal() {
+      const weatherInfo = document.getElementById("weather-info-minimal");
+      try {
+        const res = await fetch(
+          "https://api.open-meteo.com/v1/forecast?latitude=-7.98&longitude=112.63&current_weather=true&hourly=temperature_2m,relativehumidity_2m,weathercode&timezone=Asia%2FJakarta"
+        );
+        const data = await res.json();
+        const cur = data.current_weather;
+        const weatherData = {
+          temp: Math.round(cur.temperature),
+          description: getWeatherDescription(cur.weathercode),
+          humidity: data.hourly.relativehumidity_2m[0] ?? 75,
+          icon: getWeatherIcon(cur.weathercode),
+        };
+        weatherInfo.innerHTML = `
+          <div class="flex items-center justify-center space-x-4">
+            <div class="text-6xl">${weatherData.icon}</div>
+            <div class="text-center">
+              <div class="text-3xl font-bold text-gray-800">${weatherData.temp}°C</div>
+              <div class="text-lg text-gray-600 capitalize">${weatherData.description}</div>
+              <div class="text-sm text-gray-500 mt-1">Kelembaban: ${weatherData.humidity}%</div>
+            </div>
+          </div>
+          <p class="text-xs mt-4 text-center text-gray-600">*Data cuaca real-time dari Open-Meteo untuk Malang</p>
+        `;
+      } catch (e) {
+        console.error("Error fetching weather:", e);
+        fetchWeatherMinimalStatic();
+      }
+    }
+    function fetchWeatherMinimalStatic() {
+      const weatherInfo = document.getElementById("weather-info-minimal");
+      const w = { temp: 28, description: "Cerah Berawan", humidity: 75, icon: "⛅" };
+      weatherInfo.innerHTML = `
+        <div class="flex items-center justify-center space-x-4">
+          <div class="text-6xl">${w.icon}</div>
+          <div class="text-center">
+            <div class="text-3xl font-bold text-gray-800">${w.temp}°C</div>
+            <div class="text-lg text-gray-600 capitalize">${w.description}</div>
+            <div class="text-sm text-gray-500 mt-1">Kelembaban: ${w.humidity}%</div>
+          </div>
+        </div>
+        <p class="text-xs mt-4 text-center text-gray-600">*Prakiraan cuaca untuk 2 Februari 2026. Kondisi dapat berubah menjelang hari H.</p>
+      `;
+    }
+    function getWeatherDescription(code) {
+      const d = {0:"Cerah",1:"Sebagian Berawan",2:"Sebagian Berawan",3:"Berawan",45:"Kabut",48:"Kabut Beku",51:"Gerimis Ringan",53:"Gerimis",55:"Gerimis Lebat",56:"Gerimis Beku Ringan",57:"Gerimis Beku",61:"Hujan Ringan",63:"Hujan",65:"Hujan Lebat",66:"Hujan Beku Ringan",67:"Hujan Beku",71:"Salju Ringan",73:"Salju",75:"Salju Lebat",77:"Butiran Salju",80:"Hujan Ringan",81:"Hujan",82:"Hujan Lebat",85:"Salju Ringan",86:"Salju Lebat",95:"Badai Petir",96:"Badai Petir dengan Hujan Es",99:"Badai Petir dengan Hujan Es Lebat"};
+      return d[code] || "Berawan";
+    }
+    function getWeatherIcon(code) {
+      const i = {0:"☀️",1:"🌤️",2:"⛅",3:"☁️",45:"🌫️",48:"🌫️",51:"🌦️",53:"🌦️",55:"🌦️",56:"🌧️",57:"🌧️",61:"🌦️",63:"🌧️",65:"🌧️",66:"🌧️",67:"🌧️",71:"❄️",73:"❄️",75:"❄️",77:"❄️",80:"🌦️",81:"🌧️",82:"🌧️",85:"❄️",86:"❄️",95:"⛈️",96:"⛈️",99:"⛈️"};
+      return i[code] || "⛅";
+    }
+
+    // Autoplay musik (ditangani jika diblokir)
+    document.addEventListener("DOMContentLoaded", () => {
+      const audio = document.getElementById("wedding-music");
+      if (audio) {
+        audio.volume = 0.3;
+        audio.play().catch(() => {
+          console.log("Auto-play blocked by browser, user interaction required");
+        });
+      }
+      fetchWeatherMinimal();
+    });
+  </script>
+</body>
+</html>

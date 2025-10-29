@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Undangan – Classic Ivory (Reno & Diva)</title>
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- EmailJS (global) -->
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script>
+    (function(){
+      emailjs.init({ publicKey: "xWVSKIZ7kkEPsUPYX" }); /* ganti jika perlu */
+    })();
+  </script>
+
+  <!-- Firebase SDK (modular) -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore }   from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCw0DuB0b_2xyLyae4rheKP0zxg9uG4TKs",
+      authDomain: "momen-lkita.firebaseapp.com",
+      projectId: "momen-lkita",
+      storageBucket: "momen-lkita.appspot.com", /* dibenahi */
+      messagingSenderId: "303834377913",
+      appId: "1:303834377913:web:78c5fdf422ec8fb1fc7568",
+      measurementId: "G-KV17XXM2CD"
+    };
+
+    let app, db;
+    try {
+      app = initializeApp(firebaseConfig);
+      db  = getFirestore(app);
+      console.log("Firebase initialized successfully");
+    } catch (err) {
+      console.error("Firebase initialization error:", err);
+    }
+
+    // Ekspose global untuk dipakai script lain
+    window.firebaseApp = app;
+    window.firebaseDb  = db;
+    window.emailjsLib  = emailjs;
+  </script>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    /* Love Particles Animation + tema */
+    :root { --accent: #b08940 }
+    .love-particles { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; overflow: hidden; }
+    .love-particle { position: absolute; font-size: 20px; color: rgba(176, 137, 64, .6); animation: fall 8s linear infinite; user-select: none; }
+    .love-particle:nth-child(odd){ animation-delay:-2s; animation-duration:10s }
+    .love-particle:nth-child(3n){  animation-delay:-4s; animation-duration:12s }
+    .love-particle:nth-child(5n){  animation-delay:-6s; animation-duration:9s }
+    @keyframes fall { 0%{ transform:translateY(-100px) rotate(0); opacity:0 } 10%{opacity:1} 90%{opacity:1} 100%{ transform:translateY(100vh) rotate(360deg); opacity:0 } }
+
+    body { font-family: Inter, system-ui, Arial, sans-serif; color:#0f172a }
+    body::before { content:""; position:fixed; inset:0; background:url('../images/MasAdek.jpg') center/cover no-repeat; filter:brightness(.45); z-index:-1 }
+    .serif { font-family:"Playfair Display", serif }
+    .glass { backdrop-filter: saturate(120%) blur(6px) }
+
+    /* Kalender */
+    .calendar-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:4px; margin-bottom:16px }
+    .calendar-header { display:contents }
+    .calendar-header>div { padding:8px; text-align:center; font-weight:600; font-size:12px; color:#6b7280 }
+    .calendar-days { display:contents }
+    .calendar-day { aspect-ratio:1; display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:500; border-radius:6px; transition:.2s }
+    .calendar-day:not(.empty){ background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.2) }
+    .calendar-day.empty{ background:transparent }
+    .calendar-day.wedding-day{ background:var(--accent); color:#fff; font-weight:700; border:2px solid rgba(255,255,255,.3); box-shadow:0 2px 8px rgba(0,0,0,.2) }
+    .calendar-day:hover:not(.empty){ background:rgba(255,255,255,.2); transform:scale(1.05) }
+    .calendar-day.wedding-day:hover{ background:var(--accent); transform:scale(1.05) }
+    @media (max-width:640px){ .calendar-grid{gap:2px} .calendar-day{font-size:12px} .calendar-header>div{font-size:10px; padding:4px}}
+  </style>
+</head>
+<body>
+  <!-- Love Particles -->
+  <div class="love-particles">
+    <div class="love-particle">💕</div><div class="love-particle">💖</div><div class="love-particle">💗</div>
+    <div class="love-particle">💓</div><div class="love-particle">💞</div><div class="love-particle">💘</div>
+    <div class="love-particle">💝</div><div class="love-particle">💟</div><div class="love-particle">💕</div>
+    <div class="love-particle">💖</div><div class="love-particle">💗</div><div class="love-particle">💓</div>
+    <div class="love-particle">💞</div><div class="love-particle">💘</div><div class="love-particle">💝</div>
+    <div class="love-particle">💟</div><div class="love-particle">💕</div><div class="love-particle">💖</div>
+    <div class="love-particle">💗</div><div class="love-particle">💓</div><div class="love-particle">💞</div>
+    <div class="love-particle">💘</div><div class="love-particle">💝</div><div class="love-particle">💟</div>
+  </div>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('.love-particle').forEach((p,i)=> {
+        p.style.left = Math.random()*100 + '%';
+        p.style.animationDelay = (i*0.5) + 's';
+      });
+    });
+  </script>
+
+  <!-- HERO -->
+  <section class="px-6 py-12 md:py-16">
+    <div class="max-w-3xl mx-auto text-center">
+      <div class="inline-block px-3 py-1 rounded-full text-[11px] tracking-[0.3em] bg-white/10 text-white/90 ring-1 ring-white/20 glass">
+        THE WEDDING OF
+      </div>
+      <h1 class="serif text-white text-4xl md:text-5xl font-semibold mt-3">Reno &amp; Diva</h1>
+      <p class="text-white/80 mt-2">Senin, 2 Februari 2026 · Universitas Muhammadiyah Malang</p>
+
+      <!-- Countdown -->
+      <div id="cd1" class="mt-6 flex justify-center gap-3"></div>
+
+      <a href="#rsvp" class="inline-block mt-8 px-5 py-2 rounded-full bg-[color:var(--accent)] text-white hover:brightness-95 shadow">
+        Buka Undangan
+      </a>
+    </div>
+  </section>
+
+  <!-- DETAIL ACARA -->
+  <section class="px-6 pb-10">
+    <div class="max-w-3xl mx-auto space-y-4">
+      <div class="rounded-2xl bg-white/85 glass shadow ring-1 ring-black/5 p-6">
+        <h2 class="serif text-2xl mb-2">Save The Date</h2>
+        <p>Keluarga besar mengundang Bapak/Ibu/Saudara/i untuk hadir pada acara pernikahan kami.</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="rounded-2xl bg-white/85 glass shadow ring-1 ring-black/5 p-6">
+          <p class="font-semibold">Akad Nikah</p>
+          <p>Senin, 2 Februari 2026 — 09.00 WIB</p>
+          <p>Universitas Muhammadiyah Malang (UMM)</p>
+        </div>
+        <div class="rounded-2xl bg-white/85 glass shadow ring-1 ring-black/5 p-6">
+          <p class="font-semibold">Resepsi</p>
+          <p>Senin, 2 Februari 2026 — 12.00–15.00 WIB</p>
+          <p>Universitas Muhammadiyah Malang (UMM)</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- LOKASI -->
+  <section class="px-6 pb-12">
+    <div class="max-w-3xl mx-auto">
+      <h2 class="serif text-2xl text-white mb-3">Lokasi Acara</h2>
+      <div class="rounded-2xl overflow-hidden shadow ring-1 ring-black/20">
+        <iframe class="w-full h-72 border-0"
+          src="https://www.google.com/maps?q=Universitas%20Muhammadiyah%20Malang&output=embed"
+          loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+      </div>
+      <div class="mt-3 flex flex-wrap gap-3">
+        <a target="_blank" href="https://maps.google.com/?q=Universitas%20Muhammadiyah%20Malang"
+           class="inline-block px-4 py-2 rounded-full bg-white/90 hover:bg-white ring-1 ring-slate-300">
+          Buka di Google Maps
+        </a>
+        <a target="_blank" href="https://calendar.google.com/calendar/render?action=TEMPLATE&text=Pernikahan+Reno+%26+Diva&dates=20260202T020000Z/20260202T080000Z&details=Akad+Nikah+dan+Resepsi+Pernikahan+Reno+dan+Diva&location=Universitas+Muhammadiyah+Malang+(UMM)&sf=true&output=xml"
+           class="inline-block px-4 py-2 rounded-full bg-[color:var(--accent)] text-white hover:brightness-95">
+          Tambah ke Google Calendar
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- CUACA -->
+  <section class="px-6 pb-6">
+    <div class="max-w-3xl mx-auto">
+      <div class="rounded-2xl bg-white/85 glass shadow ring-1 ring-black/5 p-6">
+        <h2 class="serif text-2xl mb-2">Prakiraan Cuaca</h2>
+        <div id="weather-info" class="text-sm">
+          <p>Memuat informasi cuaca...</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- KALENDER ACARA -->
+  <section class="px-6 pb-10">
+    <div class="max-w-3xl mx-auto">
+      <h2 class="serif text-2xl text-white mb-3">Kalender Acara</h2>
+      <div class="rounded-2xl bg-white/85 glass shadow ring-1 ring-black/5 p-6">
+        <h3 class="text-lg font-semibold mb-4 text-center">Februari 2026</h3>
+        <div class="calendar-grid">
+          <div class="calendar-header">
+            <div>Min</div><div>Sen</div><div>Sel</div><div>Rab</div><div>Kam</div><div>Jum</div><div>Sab</div>
+          </div>
+          <div class="calendar-days">
+            <div class="calendar-day empty"></div><div class="calendar-day empty"></div><div class="calendar-day empty"></div>
+            <div class="calendar-day empty"></div><div class="calendar-day empty"></div><div class="calendar-day">1</div>
+            <div class="calendar-day wedding-day">2</div>
+            <div class="calendar-day">3</div><div class="calendar-day">4</div><div class="calendar-day">5</div>
+            <div class="calendar-day">6</div><div class="calendar-day">7</div><div class="calendar-day">8</div>
+            <div class="calendar-day">9</div><div class="calendar-day">10</div><div class="calendar-day">11</div>
+            <div class="calendar-day">12</div><div class="calendar-day">13</div><div class="calendar-day">14</div>
+            <div class="calendar-day">15</div><div class="calendar-day">16</div><div class="calendar-day">17</div>
+            <div class="calendar-day">18</div><div class="calendar-day">19</div><div class="calendar-day">20</div>
+            <div class="calendar-day">21</div><div class="calendar-day">22</div><div class="calendar-day">23</div>
+            <div class="calendar-day">24</div><div class="calendar-day">25</div><div class="calendar-day">26</div>
+            <div class="calendar-day">27</div><div class="calendar-day">28</div>
+          </div>
+        </div>
+        <div class="mt-4 text-center">
+          <div class="inline-flex items-center gap-2 text-sm">
+            <div class="w-3 h-3 bg-[color:var(--accent)] rounded"></div>
+            <span>Hari Pernikahan</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MUSIK LATAR -->
+  <section class="px-6 pb-8">
+    <div class="max-w-3xl mx-auto text-center">
+      <audio id="wedding-music" autoplay loop style="display: none;">
+        <source src="../Music/Rio Clappy - Bunga Abadi (Official Lyric Video) [fPMB2H450iI].mp3" type="audio/mpeg">
+        Browser Anda tidak mendukung pemutar audio.
+      </audio>
+      <p class="text-white/70 text-sm">Musik: Rio Clappy - Bunga Abadi</p>
+    </div>
+  </section>
+
+  <!-- RSVP -->
+  <section id="rsvp" class="px-6 pb-16">
+    <div class="max-w-3xl mx-auto">
+      <h2 class="serif text-2xl text-white mb-3">Konfirmasi Kehadiran</h2>
+      <form onsubmit="event.preventDefault(); submitRSVP(this); return false;"
+            class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white/90 glass p-6 rounded-2xl shadow">
+        <input required name="nama"  placeholder="Nama Lengkap" class="col-span-1 md:col-span-2 rounded-lg border p-3">
+        <input required name="email" type="email" placeholder="Email" class="rounded-lg border p-3">
+        <select name="kehadiran" class="rounded-lg border p-3">
+          <option value="Hadir">Hadir</option>
+          <option value="Tidak Hadir">Tidak Hadir</option>
+        </select>
+        <input type="number" min="1" name="jumlahTamu" placeholder="Jumlah Tamu" class="rounded-lg border p-3">
+        <textarea name="ucapan" placeholder="Ucapan" class="col-span-1 md:col-span-2 rounded-lg border p-3 h-28"></textarea>
+        <button type="submit" class="col-span-1 md:col-span-2 rounded-lg bg-[color:var(--accent)] text-white py-3 hover:brightness-95">
+          Kirim
+        </button>
+      </form>
+    </div>
+  </section>
+
+  <!-- RSVP logic (module) -->
+  <script type="module">
+    import { collection, addDoc, serverTimestamp }
+      from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    window.submitRSVP = async function(form) {
+      const btn = form.querySelector('button[type="submit"]');
+      const original = btn.textContent;
+
+      try {
+        btn.textContent = "Mengirim...";
+        btn.disabled = true;
+
+        const fd = new FormData(form);
+        const nTamu = parseInt(fd.get("jumlahTamu"));
+
+        const data = {
+          nama: fd.get("nama"),
+          email: fd.get("email"),
+          kehadiran: fd.get("kehadiran"),
+          jumlahTamu: Number.isFinite(nTamu) ? nTamu : 1,
+          ucapan: fd.get("ucapan"),
+          createdAt: serverTimestamp(),
+          template: "classic-ivory"
+        };
+
+        if (!window.firebaseDb) throw new Error("Firestore not initialized");
+        await addDoc(collection(window.firebaseDb, "rsvp"), data);
+
+        // kirim email via EmailJS
+        if (window.emailjsLib) {
+          const params = {
+            to_email: String(data.email || ""),
+            nama: String(data.nama || ""),
+            kehadiran: String(data.kehadiran || ""),
+            jumlahTamu: String(data.jumlahTamu ?? ""),
+            ucapan: String(data.ucapan || "-"),
+            tanggal_acara: "Senin, 2 Februari 2026",
+            lokasi: "Universitas Muhammadiyah Malang (UMM)",
+            reply_to: String(data.email || "")
+          };
+
+          try {
+            const res = await window.emailjsLib.send(
+              "service_d291klq",
+              "template_uq1ktop",
+              params
+            );
+            console.log("EmailJS:", res);
+            alert("Terima kasih! Data tersimpan & email terkirim ke " + data.email);
+          } catch (e) {
+            console.error("EmailJS error:", e, e?.text);
+            alert("Data tersimpan, namun email konfirmasi gagal dikirim. (" + (e?.text || e.message) + ")");
+          }
+        } else {
+          alert("Terima kasih! Konfirmasi kehadiran berhasil disimpan.");
+        }
+
+        form.reset();
+      } catch (err) {
+        console.error("Submit RSVP error:", err);
+        alert("Maaf, terjadi kesalahan: " + err.message);
+      } finally {
+        btn.textContent = original;
+        btn.disabled = false;
+      }
+    };
+  </script>
+
+  <!-- Util: countdown, cuaca, autoplay -->
+  <script>
+    // Countdown → 2 Feb 2026 09:00 WIB
+    (function(){
+      const el = document.getElementById('cd1');
+      if(!el) return;
+      const target = new Date('2026-02-02T09:00:00+07:00').getTime();
+      const card = (v,l)=>`<div class="min-w-[72px] text-white"><div class="rounded-lg bg-white/10 glass px-3 py-2 text-lg font-semibold ring-1 ring-white/15">${v}</div><div class="text-xs mt-1 text-white/80">${l}</div></div>`;
+      const tick=()=>{const now=Date.now(),d=Math.max(0,target-now),day=Math.floor(d/86400000),hr=Math.floor(d%86400000/3600000),mn=Math.floor(d%3600000/60000),sc=Math.floor(d%60000/1000);el.innerHTML=card(day,'Hari')+card(hr,'Jam')+card(mn,'Menit')+card(sc,'Detik')};
+      tick(); setInterval(tick,1000);
+    })();
+
+    // Cuaca Open-Meteo
+    async function fetchWeather(){
+      const wrap = document.getElementById('weather-info');
+      try{
+        const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=-7.98&longitude=112.63&current_weather=true&hourly=temperature_2m,relativehumidity_2m,weathercode&timezone=Asia%2FJakarta');
+        const data = await res.json();
+        const cur = data.current_weather;
+        const desc = getWeatherDescription(cur.weathercode);
+        const icon = getWeatherIcon(cur.weathercode);
+        const hum  = data?.hourly?.relativehumidity_2m?.[0] ?? 75;
+        wrap.innerHTML = `
+          <div class="flex items-center justify-center space-x-4">
+            <div class="text-6xl">${icon}</div>
+            <div class="text-center">
+              <div class="text-3xl font-bold text-gray-800">${Math.round(cur.temperature)}°C</div>
+              <div class="text-lg text-gray-600 capitalize">${desc}</div>
+              <div class="text-sm text-gray-500 mt-1">Kelembaban: ${hum}%</div>
+            </div>
+          </div>
+          <p class="text-xs mt-4 text-center text-gray-600">*Data cuaca real-time dari Open-Meteo untuk Malang</p>`;
+      }catch(e){
+        console.error('Error fetching weather:', e);
+        fetchWeatherStatic();
+      }
+    }
+    function fetchWeatherStatic(){
+      const wrap = document.getElementById('weather-info');
+      wrap.innerHTML = `
+        <div class="flex items-center justify-center space-x-4">
+          <div class="text-6xl">⛅</div>
+          <div class="text-center">
+            <div class="text-3xl font-bold text-gray-800">28°C</div>
+            <div class="text-lg text-gray-600 capitalize">Cerah Berawan</div>
+            <div class="text-sm text-gray-500 mt-1">Kelembaban: 75%</div>
+          </div>
+        </div>
+        <p class="text-xs mt-4 text-center text-gray-600">*Prakiraan cuaca untuk 2 Februari 2026. Kondisi dapat berubah menjelang hari H.</p>`;
+    }
+    function getWeatherDescription(c){
+      const d={0:'Cerah',1:'Sebagian Berawan',2:'Sebagian Berawan',3:'Berawan',45:'Kabut',48:'Kabut Beku',51:'Gerimis Ringan',53:'Gerimis',55:'Gerimis Lebat',56:'Gerimis Beku Ringan',57:'Gerimis Beku',61:'Hujan Ringan',63:'Hujan',65:'Hujan Lebat',66:'Hujan Beku Ringan',67:'Hujan Beku',71:'Salju Ringan',73:'Salju',75:'Salju Lebat',77:'Butiran Salju',80:'Hujan Ringan',81:'Hujan',82:'Hujan Lebat',85:'Salju Ringan',86:'Salju Lebat',95:'Badai Petir',96:'Badai Petir dengan Hujan Es',99:'Badai Petir dengan Hujan Es Lebat'}; return d[c]||'Berawan';
+    }
+    function getWeatherIcon(c){
+      const i={0:'☀️',1:'🌤️',2:'⛅',3:'☁️',45:'🌫️',48:'🌫️',51:'🌦️',53:'🌦️',55:'🌦️',56:'🌧️',57:'🌧️',61:'🌦️',63:'🌧️',65:'🌧️',66:'🌧️',67:'🌧️',71:'❄️',73:'❄️',75:'❄️',77:'❄️',80:'🌦️',81:'🌧️',82:'🌧️',85:'❄️',86:'❄️',95:'⛈️',96:'⛈️',99:'⛈️'}; return i[c]||'⛅';
+    }
+
+    // Autoplay musik + fetch cuaca
+    document.addEventListener('DOMContentLoaded', () => {
+      const audio = document.getElementById('wedding-music');
+      if (audio) audio.play().catch(()=>console.log('Auto-play blocked; user interaction required'));
+      fetchWeather();
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,117 @@
+/* =========================================================
+   Momen Kita — CHECKOUT (stacked layout, bigger UI)
+   ========================================================= */
+:root{
+  --sand-25:#F9F5EE;
+  --sand-50:#F4EEE4;
+  --sand-100:#EEE3D2;
+  --sand-200:#E6D7BF;
+  --sand-300:#DCC7A6;
+  --sand-500:#CFA45E;
+  --sand-600:#B9883E;
+  --ink-900:#1E1E1E;
+
+  --radius-lg:18px;
+  --radius-xl:26px;
+
+  --shadow-sm:0 6px 20px rgba(20,20,20,.06);
+  --shadow-md:0 14px 30px rgba(20,20,20,.12);
+  --shadow-lg:0 28px 60px rgba(20,20,20,.18);
+}
+
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  display:flex; flex-direction:column; min-height:100vh;
+  font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,'Helvetica Neue',Arial,sans-serif;
+  color:var(--ink-900);
+  background:
+    radial-gradient(1600px 550px at 50% -260px, rgba(255,255,255,.9), transparent 70%),
+    linear-gradient(180deg, var(--sand-25), var(--sand-50) 60%, var(--sand-100));
+}
+main{flex:1}
+.container{max-width:1240px;margin-inline:auto;padding-inline:24px}
+
+/* ---------- Header ---------- */
+.site-header{
+  position:sticky; top:0; z-index:50;
+  background:rgba(255,255,255,.7);
+  backdrop-filter:saturate(180%) blur(10px);
+  border-bottom:1px solid rgba(0,0,0,.04);
+  transition:all .25s ease;
+}
+.site-header.is-scrolled{
+  background:rgba(255,255,255,.92);
+  box-shadow:var(--shadow-sm);
+}
+.nav-row{height:64px; display:flex; align-items:center; justify-content:space-between}
+.brand{font-family:'Playfair Display',serif; font-size:22px; color:var(--sand-600); font-weight:700; text-decoration:none}
+.nav-links{gap:28px; display:flex}
+.nav-link{color:#4b5563; text-decoration:none; font-weight:500}
+.nav-link:hover{color:var(--sand-600)}
+.menu-btn{color:#374151}
+.btn-pill{
+  background:linear-gradient(180deg, var(--sand-500), var(--sand-600));
+  color:#fff; padding:.8rem 1.2rem; border-radius:999px;
+  font-weight:600; text-decoration:none; box-shadow:0 8px 24px rgba(185,136,62,.25);
+}
+.btn-soft{
+  background:#fff; color:#374151; border-radius:999px;
+  padding:.75rem 1.1rem; text-decoration:none; box-shadow:var(--shadow-sm);
+}
+.mobile-links{display:flex; flex-direction:column; gap:12px; padding:10px 0}
+
+/* ---------- Section ---------- */
+.section{padding:64px 0}
+.section-title{
+  font-family:'Playfair Display',serif; font-size:34px; line-height:1.2; margin:0 0 18px;
+}
+
+/* ---------- Stacked layout ---------- */
+.checkout-stack{
+  max-width:1100px;
+  margin: 8px auto 0;
+  display:flex; flex-direction:column; align-items:center;
+  gap:28px;
+}
+
+/* Ringkasan */
+.checkout-card{
+  width:min(100%, 460px);
+  background:#fff; border:1px solid rgba(0,0,0,.06); border-radius:20px; padding:22px 20px; box-shadow:var(--shadow-sm);
+}
+.card-title{font-weight:800; margin:0 0 12px; font-size:18px}
+.row{display:flex; justify-content:space-between; padding:10px 0; color:#374151; font-size:15px}
+.row.total{font-weight:800; font-size:18px}
+.divider{height:1px; background:rgba(0,0,0,.06); margin:12px 0}
+.help{font-size:12px; color:#6b7280; margin-top:8px}
+
+/* Grid pembayaran besar */
+.pay-wrap{width:100%}
+.pay-grid{
+  display:grid;
+  grid-template-columns:repeat(5, minmax(180px, 1fr));
+  gap:24px;
+}
+@media (max-width:1200px){ .pay-grid{grid-template-columns:repeat(4, minmax(180px,1fr))} }
+@media (max-width:992px) { .pay-grid{grid-template-columns:repeat(3, minmax(180px,1fr))} }
+@media (max-width:720px) { .pay-grid{grid-template-columns:repeat(2, minmax(180px,1fr))} }
+@media (max-width:480px) { .pay-grid{grid-template-columns:1fr} }
+
+.bank-card{
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:14px; background:#fff; border:1px solid rgba(0,0,0,.06); border-radius:20px; padding:26px 18px;
+  min-height:200px; box-shadow:var(--shadow-sm); cursor:pointer; position:relative;
+  transition:transform .18s ease, box-shadow .18s ease, outline-color .18s ease;
+}
+.bank-card:hover{transform:translateY(-2px)}
+.bank-card input{position:absolute; inset:0; opacity:0; cursor:pointer}
+.bank-card img{
+  display:block; max-height:74px; width:auto; height:auto; object-fit:contain;
+  filter: drop-shadow(0 1px 0 rgba(0,0,0,.02));
+}
+.bank-card span{font-weight:800; color:#374151; font-size:16px}
+.bank-card.is-selected{outline:3px solid #D4AF70; outline-offset:2px; box-shadow:0 18px 48px rgba(212,175,112,.24)}
+
+/* ---------- Footer ---------- */
+.footer{background:#111; padding:22px 0; color:#fff;}
