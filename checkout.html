@@ -212,7 +212,11 @@
             </div>
 
             <div class="space-y-3 mt-6">
-              <a id="btn-wa" target="_blank" href="#" class="btn-pill w-full block text-center group">
+              <!-- WhatsApp Button dengan link langsung -->
+              <a id="btn-wa" 
+                 href="https://wa.me/62811456999?text=Halo,%20saya%20ingin%20konfirmasi%20pembayaran"
+                 target="_blank" 
+                 class="btn-pill w-full block text-center group">
                 <i class="fab fa-whatsapp mr-2 group-hover:scale-110 transition-transform"></i>
                 Konfirmasi via WhatsApp
                 <i class="fas fa-arrow-right ml-2 text-sm group-hover:translate-x-0.5 transition-transform"></i>
@@ -461,12 +465,22 @@
     const btnWA = document.getElementById('btn-wa');
     let selectedPayment = 'QRIS';
 
+    // WhatsApp Number (Your Number)
+    const WHATSAPP_NUMBER = '62811456999';
+
     function updateWhatsAppLink() {
       const chosen = selectedPayment;
       const invoiceId = document.getElementById('invoice-id').textContent;
-      const msg = `Halo, saya ingin konfirmasi pembayaran:\n\n📋 Invoice: #INV${invoiceId}\n📦 Paket: ${packageData.name}\n💰 Harga: ${formatRupiah(packageData.price)}\n💳 Metode: ${chosen}\n\nMohon informasi rekening untuk pembayaran. Terima kasih.`;
       
-      btnWA.href = `https://wa.me/62811456999?text=${encodeURIComponent(msg)}`;
+      // Format pesan yang lebih rapi
+      const msg = `Halo Momen Kita,\n\nSaya ingin konfirmasi pembayaran:\n📋 Invoice: #INV${invoiceId}\n📦 Paket: ${packageData.name}\n💰 Harga: ${formatRupiah(packageData.price)}\n💳 Metode: ${chosen}\n\nMohon informasi rekening untuk pembayaran. Terima kasih.`;
+      
+      // Update link WhatsApp
+      const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
+      btnWA.href = whatsappUrl;
+      
+      // Debug: Log link ke console
+      console.log('WhatsApp URL:', whatsappUrl);
       
       // Add ripple effect to button
       createRipple(btnWA);
@@ -543,6 +557,20 @@
           });
         }
       });
+    });
+
+    // Fallback: Direct WhatsApp link jika JavaScript gagal
+    document.addEventListener('DOMContentLoaded', function() {
+      const waButton = document.getElementById('btn-wa');
+      if (waButton) {
+        // Set initial link
+        waButton.href = `https://wa.me/${WHATSAPP_NUMBER}?text=Halo,%20saya%20ingin%20konfirmasi%20pembayaran`;
+        
+        // Update link setelah data dimuat
+        setTimeout(() => {
+          updateWhatsAppLink();
+        }, 1000);
+      }
     });
   </script>
 </body>
