@@ -41,8 +41,11 @@
       console.error('Firebase initialization error:', error);
     }
 
+    // 暴露Firebase函数到全局作用域
     window.firebaseApp = app;
     window.firebaseDb = db;
+    window.addDoc = addDoc;  // 添加这一行
+    window.collection = collection;  // 添加这一行
     window.emailjsLib = emailjs;
   </script>
 
@@ -69,7 +72,7 @@
 
         // Simpan ke Firestore
         if (window.firebaseDb) {
-          await addDoc(collection(window.firebaseDb, "rsvp"), data);
+          await window.addDoc(window.collection(window.firebaseDb, "rsvp"), data);
         }
 
         // Kirim email konfirmasi
