@@ -397,7 +397,6 @@
   background: #0F0F0F;
 }
 
-/* ========== Responsive Design ========== */
 @media (max-width: 1024px) {
   .hero-grid {
     grid-template-columns: 1fr;
@@ -487,7 +486,6 @@
   }
 }
 
-/* ========== Accessibility: Reduce Motion ========== */
 @media (prefers-reduced-motion: reduce) {
   .mock,
   .mock-1,
@@ -504,7 +502,6 @@
   }
 }
 
-/* ========== Print Styles ========== */
 @media print {
   .header,
   .cta,
